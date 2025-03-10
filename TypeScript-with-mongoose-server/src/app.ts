@@ -10,6 +10,6 @@ app.use(cors());
 app.use(express.json());
 
 
-app.use("/api/card", cardRouter)
+app.use("/api", cardRouter)
 
 export default app;
