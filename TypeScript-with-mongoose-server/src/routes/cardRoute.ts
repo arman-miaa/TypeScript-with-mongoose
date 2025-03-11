@@ -10,7 +10,7 @@ router.get("/getAllCards", cardController.getCard)
 
 router.get("/card/:id", cardController.getSingleCard)
 
-router.post("/postCard", cardController.createCard);
+router.post("/Card", cardController.createCard);
 router.put("/card/:id", cardController.updateCard)
 router.delete("/card/:id", cardController.deleteCard)
 

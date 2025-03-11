@@ -23,6 +23,7 @@ const createCard = async (req: Request, res: Response) => {
 // Get all cards
 const getCard = async (req: Request, res: Response) => {
   try {
+    
     const result = await Card.find();
     res.status(200).json({ success: true, data: result });
   } catch (error: any) {
@@ -85,5 +86,7 @@ const deleteCard = async (req: Request, res: Response) => {
     res.status(400).json({ success: false, message: "Card Delete Failed" });
   }
 };
+
+
 
 export default { createCard, getCard, deleteCard, updateCard, getSingleCard };
