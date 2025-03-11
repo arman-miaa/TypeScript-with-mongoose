@@ -6,12 +6,15 @@ import cardController from "../controllers/cardController";
 
 const router = express.Router();
 
-router.get("/getCard", cardController.getCard )
+router.get("/getAllCards", cardController.getCard)
+
+router.get("/card/:id", cardController.getSingleCard)
 
 router.post("/postCard", cardController.createCard);
+router.put("/card/:id", cardController.updateCard)
 router.delete("/card/:id", cardController.deleteCard)
 
-// router.delete("/card/:id", cardController.deleteCard )
+
 
 
 
