@@ -1,10 +1,11 @@
 import { Request, Response } from "express";
 import Card from "../models/cardModel";
+import cardValidationSchema from "../validations/cardValidation";
 
 // Create a new card
 const createCard = async (req: Request, res: Response) => {
   try {
-    const newCard = req.body;
+    const newCard = cardValidationSchema.parse(req.body)
     const result = await Card.create(newCard);
     res.status(200).json({ success: true, data: result });
   } catch (error: any) {
@@ -50,7 +51,7 @@ const getSingleCard = async (req: Request, res: Response) => {
 const updateCard = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    const updateData = req.body;
+    const updateData = cardValidationSchema.parse(req.body);
     const result = await Card.findByIdAndUpdate(id, updateData, { new: true });
     if (!result) {
       res.status(404).json({ success: false, message: "Card Not Found" });
@@ -61,7 +62,7 @@ const updateCard = async (req: Request, res: Response) => {
     console.error(error);
     res.status(400).json({ success: false, message: error.message });
   }
-};
+}; 
 
 // Delete a card
 const deleteCard = async (req: Request, res: Response) => {
