@@ -26,8 +26,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const mongoose_1 = __importStar(require("mongoose"));
 const cardSchema = new mongoose_1.Schema({
     title: { type: String, required: true },
-    body: String,
-    date: { type: Date, default: Date.now }
+    description: String,
+    date: { type: Date, default: Date.now },
 });
 const Card = mongoose_1.default.model("Card", cardSchema);
 exports.default = Card;
