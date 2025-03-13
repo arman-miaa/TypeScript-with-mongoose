@@ -1,57 +1,57 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
-import { Link } from "react-router";
+import { useState } from "react";
 
 interface Card {
   _id: string;
   title: string;
-  body: string;
+  description: string;
 }
 
-// const fetchCards = async (): Promise<Card[]> => {
-//   const response = await axios("http://localhost:5000/api/getAllCards");
-//   if (!response) {
-//     throw new Error("Failed to fetch data");
-//   }
-
-
-
- 
-//   return response.data.data
-// };
-
 function Banner() {
+  const [page, setPage] = useState<number>(1);
 
-  const { data, isLoading, isError, error,isFetching,refetch } = useQuery<Card[]>({
-    queryKey: ["cards"],
+  const { data, isLoading, isError, error } = useQuery<Card[]>({
+    queryKey: ["cards", page],
     queryFn: async () => {
-      const response = await axios("http://localhost:5000/api/getAllCards");
-      return response.data.data
+      const response = await axios(
+        `http://localhost:5000/api/getAllCards?page=${page}&limit=5`
+      );
+      return response.data.data;
     },
-    // staleTime: 5000,
-    // refetchInterval: 1000,
-    // refetchIntervalInBackground: true,
-    enabled: false
   });
-  console.log(isLoading,isFetching);
+
   if (isLoading) return <p>Loading.....</p>;
   if (isError) return <p>Error: {error?.message}</p>;
 
-
   return (
     <div className="">
-      <button onClick={() => refetch()}>Fetch Data</button>
       {data?.map((item) => (
         <div
           key={item._id}
           className="flex justify-center flex-col items-center"
         >
           <h3 className="mt-8">{item.title}</h3> <br />
-          <Link to={`/card/${item._id}`}>
-            <button className="btn bg-lime-700 p-2 text-white">Details</button>
-          </Link>
+          <p>{item._id}</p>
+          <p>{item.description}</p>
         </div>
       ))}
+
+      <button
+        className="cursor-pointer bg-purple-400 p-2 ml-2 text-white"
+        onClick={() => setPage((prev) => prev - 1)}
+        disabled={page === 1}
+      >
+        Previous Data
+      </button>
+
+      <button
+        className="cursor-pointer bg-purple-400 p-2 ml-2 text-white"
+        onClick={() => setPage((prev) => prev + 1)}
+        disabled={data && data.length < 5}
+      >
+        Next Page
+      </button>
     </div>
   );
 }
