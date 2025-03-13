@@ -1,11 +1,11 @@
 {
   "name": "server",
   "version": "1.0.0",
-  "main": "dist/server.js",
+  "main": "./dist/server.js",
   "scripts": {
     "dev": "tsnd --respawn ./src/server.ts",
-    "build": "npx tsc",
-    "start": "node dist/server.js"
+    "build": "tsc",
+    "start": "node ./dist/server.js"
   },
   "keywords": [],
   "author": "",
