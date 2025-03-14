@@ -33,7 +33,6 @@ const createCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () 
         });
     }
 });
-// Get all cards
 const getCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const page = Number(req.query.page) || 1;
@@ -41,11 +40,17 @@ const getCard = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const skip = (page - 1) * limit;
         const result = yield cardModel_1.default.find().skip(skip).limit(limit);
         const total = yield cardModel_1.default.countDocuments();
+        // Calculate hasMore and nextPage
+        const totalPages = Math.ceil(total / limit);
+        const hasMore = page < totalPages;
+        const nextPage = hasMore ? page + 1 : null; // null দিলে undefined হয়ে যাবে
         res.status(200).json({
             success: true,
             data: result,
-            totalPages: Math.ceil(total / limit),
+            totalPages,
             currentPage: page,
+            hasMore,
+            nextPage,
         });
     }
     catch (error) {

@@ -13,6 +13,9 @@ const app = (0, express_1.default)();
 app.use((0, cors_1.default)());
 app.use(express_1.default.json());
 app.use("/api", cardRoute_1.default);
+app.get("/", (req, res) => {
+    res.send("Server Is Running.......");
+});
 // not found route
 app.use("*", notFoundRoute_1.default);
 // global error handler
