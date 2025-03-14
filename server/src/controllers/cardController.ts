@@ -24,25 +24,18 @@ const createCard = async (req: Request, res: Response) => {
 
 const getCard = async (req: Request, res: Response) => {
   try {
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 5;
-    const skip = (page - 1) * limit;
+ 
 
-    const result = await Card.find().skip(skip).limit(limit);
-    const total = await Card.countDocuments();
+    const result = await Card.find();
+  
 
-    // Calculate hasMore and nextPage
-    const totalPages = Math.ceil(total / limit);
-    const hasMore = page < totalPages;
-    const nextPage = hasMore ? page + 1 : null; // null দিলে undefined হয়ে যাবে
+  
+
 
     res.status(200).json({
       success: true,
       data: result,
-      totalPages,
-      currentPage: page,
-      hasMore,
-      nextPage,
+    
     });
   } catch (error: any) {
     console.error(error);

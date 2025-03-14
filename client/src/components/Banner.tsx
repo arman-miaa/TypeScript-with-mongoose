@@ -1,7 +1,7 @@
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { Button } from "@mui/material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
-import { useEffect } from "react";
-import { useInView } from "react-intersection-observer";
+import { FormEventHandler, useState } from "react";
 
 interface Card {
   _id: string;
@@ -10,46 +10,83 @@ interface Card {
 }
 
 // ✅ Corrected fetchData function with TypeScript
-const fetchData = async ({ pageParam = 1 }: { pageParam: number }) => {
-  const response = await axios.get(
-    `http://localhost:5000/api/getAllCards?page=${pageParam}&limit=5`
-  );
-  return response.data; // Ensure only data is returned
+const fetchData = async (): Promise<Card[]> => {
+  const response = await axios.get(`http://localhost:3000/api/getAllCards`);
+  return response.data.data; // Ensure only data is returned
+};
+
+// POST method
+
+const addPost = (post: { title: string; description: string }) => {
+  return axios.post("http://localhost:3000/api/card", post);
 };
 
 function Banner() {
-  const {data, isLoading, isError, error, fetchNextPage,  isFetchingNextPage} = useInfiniteQuery({
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+
+  const queryClient = useQueryClient();
+
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ["cards"],
     queryFn: fetchData,
-    initialPageParam: 1,
-    getNextPageParam: (lastPage) => {
-      return lastPage.hasMore ? lastPage.nextPage : undefined;
+  });
+
+  const { mutate } = useMutation({
+    mutationFn: addPost,
+    onSuccess: (newData) => {
+      console.log(newData.data, "new data"); // Check if newData.data is the actual post object
+
+      queryClient.setQueryData(["cards"], (oldQueryData: { data: Card[] }) => {
+        console.log(oldQueryData, "old data");
+        return {
+          ...oldQueryData,
+          data: [...oldQueryData.data, newData.data.data], // Directly append newData.data if it's the correct data object
+        };
+      });
     },
   });
 
-  const { ref, inView } = useInView();
+  const handlePost: FormEventHandler<HTMLFormElement> = (e) => {
+    e.preventDefault();
+    const post = { title, description };
 
-  useEffect(() => {
-    if (inView) {
-      fetchNextPage();
-    }
-  },[fetchNextPage,inView])
+    mutate(post);
+    setTitle("");
+    setDescription("");
+  };
 
   if (isLoading) return <p>Loading.....</p>;
   if (isError) return <p>Error: {error?.message}</p>;
 
   return (
-    <div className="text-center">
-      {data?.pages.map((page) =>
-        page.data.map((item: Card) => (
-          <div key={item._id} className="mt-4 p-4 border">
-            <h3>{item.title}</h3>
-            <p>{item.description}</p>
+    <div className="mt-20">
+      <form onSubmit={handlePost}>
+        <input
+          onChange={(e) => setTitle(e.target.value)}
+          placeholder="Enter post title"
+          value={title}
+        />
+        <input
+          onChange={(e) => setDescription(e.target.value)}
+          placeholder="Enter post body"
+          value={description}
+        />
+        <Button type="submit" variant="contained">
+          Post
+        </Button>
+      </form>
+      <div className="text-center">
+        {data?.map((item: any) => (
+          <div key={item._id}>
+            <p>{item.title}</p>
           </div>
-        ))
-      )}
+        ))}
 
-      <div ref={ref}>{isFetchingNextPage && "Loading..."}</div>
+        <Button variant="contained" onClick={() => refetch()}>
+          Refetch
+        </Button>
+      </div>
     </div>
   );
 }
